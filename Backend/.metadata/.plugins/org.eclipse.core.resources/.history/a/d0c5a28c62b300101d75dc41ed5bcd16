@@ -1,0 +1,16 @@
+package dashboard;
+
+public class StockPrice {
+    private String symbol;
+    private double price;
+
+    public StockPrice() {}
+
+    public StockPrice(String symbol, double price) {
+        this.symbol = symbol;
+        this.price = price;
+    }
+
+    // getters and setters
+}
+

@@ -1,0 +1,32 @@
+package dashboard;
+
+import org.springframework.web.socket.server.HandshakeInterceptor;
+import org.springframework.web.socket.WebSocketHandler;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.util.Map;
+
+public class JwtHandshakeInterceptor implements HandshakeInterceptor {
+    @Override
+    public boolean beforeHandshake(
+            jakarta.servlet.http.HttpServletRequest request,
+            jakarta.servlet.http.HttpServletResponse response,
+            WebSocketHandler wsHandler,
+            Map<String, Object> attributes
+    ) {
+        String token = request.getParameter("token");
+        attributes.put("token", token); // Store for later use
+        // Optionally, validate token here (e.g., JwtUtil.validateToken(token))
+        return true; // Accept connection (can return false to block)
+    }
+
+    @Override
+    public void afterHandshake(
+            jakarta.servlet.http.HttpServletRequest request,
+            jakarta.servlet.http.HttpServletResponse response,
+            WebSocketHandler wsHandler,
+            Exception ex
+    ) {}
+}
+

@@ -1,0 +1,40 @@
+package dashboard;
+
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Service;
+import javax.annotation.PostConstruct;
+import java.util.*;
+
+@Service
+public class StockService {
+    private final SimpMessagingTemplate template;
+    private final Map<String, Double> prices = new HashMap<>();
+    private final List<String> supported = Arrays.asList("GOOG", "TSLA", "AMZN", "META", "NVDA");
+
+    public StockService(SimpMessagingTemplate template) {
+        this.template = template;
+    }
+
+    @PostConstruct
+    public void init() {
+        supported.forEach(s -> prices.put(s, 1000 + new Random().nextDouble() * 500));
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+                supported.forEach(s -> {
+                    double newPrice = prices.get(s) + (new Random().nextDouble() - 0.5) * 10;
+                    prices.put(s, Math.round(newPrice * 100.0) / 100.0);
+                    template.convertAndSend("/topic/prices", new StockPrice(s, prices.get(s)));
+                });
+            }
+        }, 0, 1000);
+    }
+
+    public List<StockPrice> getAllPrices() {
+        List<StockPrice> result = new ArrayList<>();
+        prices.forEach((symbol, price) -> result.add(new StockPrice(symbol, price)));
+        return result;
+    }
+}
+
+
